@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% set page_title = 'Profile settings' %}
+
+{% block body %}
+
+    <div class="container">
+        {% for flashMessage in app.session.flashbag.get('notice') %}
+            <div id="settingsSavedAlert" class="alert alert-success" role="alert">
+                {{ flashMessage }}
+            </div>
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-sm-6">
+                <h1>About me</h1>
+            </div>
+        </div>
+        <form action="{{ path('settings_form') }}" method="POST">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div id="nameError"></div>
+                </div>
+                <div class="col-sm-6 form-group required">
+                    <label for="firstName" class="control-label">First name</label>
+                    <input id="firstName" type="text" class="form-control" name="first_name"  value="{{ firstName|default }}" >
+                </div>
+                <div class="col-sm-6 form-group required">
+                    <label for="lastName" class="control-label">Last name</label>
+                    <input id="lastName" type="text" class="form-control" name="last_name" value="{{ lastName|default }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 form-group required">
+                    <div id="emailError"></div>
+                    <label for="email" class="control-label">Email</label>
+                    <p id="emailHelpBlock" class="form-text text-muted">
+                        Remember, your login address is the one you use to log in to Localgiving.com
+                    </p>
+                    <input id="email" type="text" class="form-control" name="email" aria-describedby="emailHelpBlock" value="{{ email|default }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 form-group">
+                    <label for="twitterUserName" class="control-label">Twitter username</label>
+                    <p id="twitterHelpBlock" class="form-text text-muted">
+                        Tell us your Twitter username so that we can tweet you about your favourite charities
+                    </p>
+                    <input id="twitterUserName" type="text" class="form-control" name="twitter_user_name"
+                           aria-describedby="twitterHelpBlock" value="{{ twitterUserName|default }}">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success pull-right">Save changes</button>
+        </form>
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+
+    <script>
+        var firstName = document.getElementById('firstName');
+        var lastName = document.getElementById('lastName');
+        var email = document.getElementById('email');
+        var emailError = document.getElementById('emailError');
+        var nameError = document.getElementById('nameError');
+        var settingsSavedAlert = document.getElementById("settingsSavedAlert");
+
+        document.querySelector("form").addEventListener("submit", function (event) {
+
+            if (firstName.value == '' || lastName.value == '') {
+                nameError.innerHTML = "<div class='alert alert-danger'>Please enter your first and last name</div>";
+                event.preventDefault();
+            } else {
+                nameError.innerHTML = "";
+            }
+
+            if (!validateEmail(email.value)) {
+
+                emailError.innerHTML = "<div class='alert alert-danger'> email: " + email.value + " is invalid</div>";
+                event.preventDefault();
+            } else {
+                emailError.innerHTML = "";
+            }
+
+            if(settingsSavedAlert.value != '') {
+                settingsSavedAlert.remove();
+            }
+        });
+
+        function validateEmail(email) {
+            var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+            return re.test(email);
+        }
+    </script>
+{% endblock %}
